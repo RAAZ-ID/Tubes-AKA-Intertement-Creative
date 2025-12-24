@@ -110,8 +110,3 @@ while True:
 
     except ValueError:
         print("Masukkan nilai n yang valid!")
-
-
-
-
-        # Cetak tabel waktu eksekusi
