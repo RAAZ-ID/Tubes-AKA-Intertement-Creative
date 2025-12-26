@@ -1,57 +1,36 @@
 import time
 
-import sys
-
 import matplotlib.pyplot as plt
 
 from prettytable import PrettyTable
 
-# Menambah batas rekursi supaya tidak error saat input angka besar
-sys.setrecursionlimit(2000)
+# Algoritma Rekursif
+def count_capitals_recursive(s, n=0, index=0):
+    if index == len(s):
+        return n
+    if 65 <= ord(s[index]) <= 90:  # ASCII cek huruf kapital
+        n += 1
+    return count_capitals_recursive(s, n, index + 1)
 
-print("Library berhasil dimuat. Lanjut ke Cell berikutnya!")
-# Iteratif
-def hitung_kapital_iteratif(teks):
-    
-    jumlah = 0
-    
-    for huruf in teks:
-        
-        if 'A' <= huruf <= 'Z':
-            
-            jumlah = jumlah + 1
-            
-    return jumlah
-# Rekursif
-def hitung_kapital_rekursif(teks, n):
+# Algoritma Iteratif
+def count_capitals_iterative(s):
+    count = 0
+    for char in s:
+        if 65 <= ord(char) <= 90:  # ASCII cek huruf kapital
+            count += 1
+    return count
 
-    if n == 0:
-        
-        return 0
-    
-    karakter = teks[n-1]
-    
-    if 'A' <= karakter <= 'Z':
-        
-        tambah = 1
-        
-    else:
-        
-        tambah = 0
-        
-    return tambah + hitung_kapital_rekursif(teks, n - 1)
-
-print("Fungsi Algoritma siap digunakan.")
 # Grafik untuk menyimpan data
 n_values = []
 recursive_times = []
 iterative_times = []
+capital_counts = []
 
-# Fungsi memperbarui grafik
+# Fungsi untuk memperbarui grafik
 def update_graph():
     plt.figure(figsize=(8, 6))
-    plt.plot(n_values, recursive_times, label='Recursive', marker='o', linestyle='-', color='red')
-    plt.plot(n_values, iterative_times, label='Iterative', marker='o', linestyle='--', color='blue')
+    plt.plot(n_values, recursive_times, label='Recursive', marker='o', linestyle='-')
+    plt.plot(n_values, iterative_times, label='Iterative', marker='o', linestyle='-')
     plt.title('Performance Comparison: Recursive vs Iterative')
     plt.xlabel('Input Size (n)')
     plt.ylabel('Execution Time (seconds)')
@@ -59,54 +38,46 @@ def update_graph():
     plt.grid(True)
     plt.show()
 
-# Fungsi mencetak tabel waktu eksekusi
+# Fungsi untuk mencetak tabel waktu eksekusi dan jumlah kapital
 def print_execution_table():
     table = PrettyTable()
-    table.field_names = ["n", "Recursive Time (s)", "Iterative Time (s)"]
-    
-    # Mengisi tabel sesuai jumlah data
-    for i in range(len(n_values)):
-        table.add_row([n_values[i], format(recursive_times[i], '.6f'), format(iterative_times[i], '.6f')])
-        
+    table.field_names = ["Input Size (n)", "Recursive Time (s)", "Iterative Time (s)", "Huruf Kapital"]
+
+    min_len = min(len(n_values), len(recursive_times), len(iterative_times), len(capital_counts))
+    for i in range(min_len):
+        table.add_row([n_values[i], recursive_times[i], iterative_times[i], capital_counts[i]])
     print(table)
+
 # Program utama
 while True:
     try:
-        n = int(input("Masukkan nilai n (atau ketik -1 untuk keluar): "))
-        
-        if n == -1:
+        s = input("Masukkan string (atau ketik 'exit' untuk keluar): ")
+        if s.lower() == 'exit':
             print("Program selesai. Terima kasih!")
             break
-            
-        if n < 0:
-            print("Masukkan nilai n yang positif!")
-            continue
 
-        # Generate Data Dummy
-        pola = "AbCdEfGhIj" 
-        teks = (pola * (n // 10 + 1))[:n]
-        
+        # Menyimpan ukuran input (n)
+        n = len(s)
         n_values.append(n)
 
-        # Ukur waktu eksekusi algoritma rekursif
+        # Eksekusi algoritma rekursif
         start_time = time.time()
-        
-        # Panggil fungsi rekursif
-        hitung_kapital_rekursif(teks, len(teks))
+        recursive_count = count_capitals_recursive(s)
         recursive_times.append(time.time() - start_time)
 
-        # Ukur waktu eksekusi algoritma iteratif
+        # Eksekusi algoritma iteratif
         start_time = time.time()
-        
-        # Panggil fungsi iteratif
-        hitung_kapital_iteratif(teks)
+        iterative_count = count_capitals_iterative(s)
         iterative_times.append(time.time() - start_time)
 
-        # Cetak tabel waktu eksekusi
+        # Menyimpan jumlah huruf kapital ke dalam list
+        capital_counts.append(recursive_count)
+
+        # Mencetak tabel waktu eksekusi dan jumlah kapital
         print_execution_table()
 
-        # Perbarui grafik
+        # Memperbarui grafik
         update_graph()
 
     except ValueError:
-        print("Masukkan nilai n yang valid!")
+        print("Masukkan string yang valid!")
